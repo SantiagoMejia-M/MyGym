@@ -78,12 +78,25 @@ function saveW(id, i, w){
   const n = parseFloat(w); if(n > best(id)) S().best[id] = n;
 }
 
+/* ---------- descarga del APK (solo Android, fuera de la app instalada) ---------- */
+const APK_URL = "downloads/MyGym.apk";
+let apkOk = null;
+const isAndroid = /Android/i.test(navigator.userAgent);
+const isInstalled = () => matchMedia("(display-mode: standalone)").matches || document.referrer.startsWith("android-app://");
+function apkBanner(){ return `<div id="apkBox"></div>`; }
+async function fillApk(){
+  const box = $("#apkBox"); if(!box || !isAndroid || isInstalled()) return;
+  if(apkOk === null){ try{ apkOk = (await fetch(APK_URL, { method: "HEAD", cache: "no-store" })).ok; }catch(e){ apkOk = false; } }
+  if(apkOk && $("#apkBox")) $("#apkBox").innerHTML = `<a class="btn ghost press" href="${APK_URL}" download="MyGym.apk" style="margin-top:12px">📲 Descargar app para Android</a>`;
+}
+
 /* =================================================================== */
 /*                               CUENTAS                               */
 /* =================================================================== */
 function authShell(inner){
   setTab(null);
-  view.innerHTML = `<div class="auth t-brand"><div class="logo"><img src="icons/icon-192.png" alt=""><b>MyGym</b></div>${inner}</div>`;
+  view.innerHTML = `<div class="auth t-brand"><div class="logo"><img src="icons/icon-192.png" alt=""><b>MyGym</b></div>${inner}${apkBanner()}</div>`;
+  fillApk();
 }
 function localNote(){ return CLOUD ? "" : `<div class="localnote">🔒 Modo local: tu cuenta y tus datos se guardan solo en este celular.</div>`; }
 function bindAuthForm(fn){
@@ -789,8 +802,10 @@ function viewPerfil(){
       <div class="row" style="padding:12px 4px"><span class="i">🌱</span><span class="grow" style="font-weight:700">Nivel</span><span class="v">${p.level ? LEVELS[p.level].name : "—"}</span></div>
       <div class="row" style="padding:12px 4px;border-top:1px solid var(--line)"><span class="i">🎯</span><span class="grow" style="font-weight:700">Objetivo</span><span class="v">${p.goal ? GOALS[p.goal].name : "—"}</span></div>
     </div>
+    ${apkBanner()}
     <button class="btn danger" id="out">Cerrar sesión</button>
     <div class="center muted" style="font-size:12px;margin-top:10px">MyGym · v1.0</div></main>`;
+  fillApk();
   $("#out").onclick = async () => { if(!confirm("¿Cerrar sesión?")) return; clearTimeout(Store.timer); if(Auth.fb && Store.uid) await Store.push(); await Auth.logout(); Store.clear(); go("#/login"); };
 }
 function viewPerfilGym(){

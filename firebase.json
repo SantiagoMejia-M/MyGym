@@ -1,11 +1,66 @@
 {
   "hosting": {
     "public": ".",
-    "ignore": ["firebase.json", ".firebaserc", "firestore.rules", "README.md", "tools/**", ".github/**", "**/.*"],
+    "ignore": [
+      "firebase.json",
+      ".firebaserc",
+      "firestore.rules",
+      "README.md",
+      "tools/**",
+      ".github/**",
+      ".git/**",
+      ".nojekyll"
+    ],
     "headers": [
-      { "source": "sw.js", "headers": [{ "key": "Cache-Control", "value": "no-cache" }] },
-      { "source": "**/*.@(js|css|html|json)", "headers": [{ "key": "Cache-Control", "value": "no-cache" }] },
-      { "source": "img/**", "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800" }] }
+      {
+        "source": "sw.js",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
+      },
+      {
+        "source": "**/*.@(js|css|html|json)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
+      },
+      {
+        "source": "img/**",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=604800"
+          }
+        ]
+      },
+      {
+        "source": "/.well-known/assetlinks.json",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ]
+      },
+      {
+        "source": "downloads/**",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "application/vnd.android.package-archive"
+          },
+          {
+            "key": "Content-Disposition",
+            "value": "attachment; filename=MyGym.apk"
+          }
+        ]
+      }
     ]
   }
 }
