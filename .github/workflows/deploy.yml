@@ -1,0 +1,26 @@
+# Publica la app en Firebase Hosting cada vez que se suben cambios.
+# Necesita el secreto FIREBASE_SERVICE_ACCOUNT (Settings → Secrets and variables → Actions).
+name: Publicar en Firebase
+
+on:
+  push:
+    branches: [main, claude/gym-routine-app-mzjkzf]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      HAS_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Falta la llave
+        if: env.HAS_KEY != 'true'
+        run: echo "::warning::Falta el secreto FIREBASE_SERVICE_ACCOUNT; no se publicó."
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        if: env.HAS_KEY == 'true'
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: mygym-6de4a
+          channelId: live

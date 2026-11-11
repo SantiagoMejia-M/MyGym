@@ -29,15 +29,26 @@ const Auth = {
         ]);
         const a = app.initializeApp(window.FIREBASE_CONFIG);
         this.fb = { auth, fs, A: auth.getAuth(a), D: fs.getFirestore(a) };
-        auth.onAuthStateChanged(this.fb.A, u => { this.user = u ? { uid: u.uid, email: u.email, name: u.displayName || "" } : null; onChange(this.user); });
+        auth.onAuthStateChanged(this.fb.A, u => {
+          this.user = u ? { uid: u.uid, email: u.email, name: u.displayName || "" } : null;
+          this.user ? ls.set("mg:lastUser", this.user) : ls.del("mg:lastUser");
+          onChange(this.user);
+        });
         return;
-      }catch(e){ console.warn("Firebase no disponible, uso modo local", e); }
+      }catch(e){
+        // Sin internet al abrir: seguimos con la última sesión y sus datos guardados en el cel.
+        console.warn("Firebase no disponible (sin conexión)", e);
+        this.offline = true;
+        this.user = ls.get("mg:lastUser", null); onChange(this.user);
+        return;
+      }
     }
     const s = ls.get("mg:session", null);
     this.user = s; onChange(s);
   },
   async register(name, email, pass){
     email = email.trim().toLowerCase();
+    if(this.offline) throw new Error("auth/network-request-failed");
     if(this.fb){
       const { auth, A } = this.fb;
       const c = await auth.createUserWithEmailAndPassword(A, email, pass);
@@ -55,6 +66,7 @@ const Auth = {
   },
   async login(email, pass){
     email = email.trim().toLowerCase();
+    if(this.offline) throw new Error("auth/network-request-failed");
     if(this.fb){ const c = await this.fb.auth.signInWithEmailAndPassword(this.fb.A, email, pass); return c.user; }
     const a = ls.get("mg:accounts", {})[email];
     if(!a || a.hash !== await sha(email + ":" + pass)) throw new Error("auth/invalid-credential");
@@ -62,6 +74,7 @@ const Auth = {
     return this.user;
   },
   async google(){
+    if(this.offline) throw new Error("auth/network-request-failed");
     if(!this.fb) throw new Error("auth/local-mode");
     const { auth, A } = this.fb;
     return auth.signInWithPopup(A, new auth.GoogleAuthProvider());
@@ -72,7 +85,7 @@ const Auth = {
   },
   async logout(){
     if(this.fb) await this.fb.auth.signOut(this.fb.A);
-    ls.del("mg:session"); this.user = null;
+    ls.del("mg:session"); ls.del("mg:lastUser"); this.user = null;
   }
 };
 async function sha(t){
@@ -105,6 +118,7 @@ const Store = {
         const snap = await fs.getDoc(fs.doc(D, "users", this.uid));
         const cloud = snap.exists() ? snap.data().state : null;
         if(cloud && (!local || (cloud.updatedAt || 0) >= (local.updatedAt || 0))) local = cloud;
+        else if(local && local.updatedAt) setTimeout(() => this.push(), 500);   // cambios hechos sin internet: súbelos
         this.status = "nube";
       }catch(e){ console.warn("No se pudo leer la nube", e); this.status = "sin conexión"; }
     }
