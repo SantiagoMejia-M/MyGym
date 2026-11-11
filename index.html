@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0c10">
+<meta name="description" content="MyGym: crea tu rutina de gym con las máquinas de tu gimnasio, con ejercicios animados, pesos sugeridos y modo entrenamiento.">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MyGym">
+<title>MyGym</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="noTabs">
+<div id="view"><div class="gen"><div class="spin"></div><p>Cargando…</p></div></div>
+
+<nav class="tabs" id="tabs">
+  <a href="#/" data-t="hoy"><span class="i">🏠</span>Hoy</a>
+  <a href="#/rutinas" data-t="rutinas"><span class="i">📋</span>Rutinas</a>
+  <a href="#/ejercicios" data-t="ejercicios"><span class="i">📚</span>Ejercicios</a>
+  <a href="#/progreso" data-t="progreso"><span class="i">📈</span>Progreso</a>
+  <a href="#/perfil" data-t="perfil"><span class="i">👤</span>Perfil</a>
+</nav>
+
+<div id="rest">
+  <div class="t1">Descansa</div>
+  <svg viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="52"/><circle class="fg" id="rfg" cx="60" cy="60" r="52"/><text x="60" y="60" id="rtxt">0:00</text></svg>
+  <div class="nx" id="rnext"></div>
+  <div class="rb"><button class="btn ghost" id="radd">+15 s</button><button class="btn main" id="rskip">Saltar ›</button></div>
+</div>
+
+<script src="js/firebase-config.js"></script>
+<script src="data/exercises.js"></script>
+<script src="data/equipment.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
